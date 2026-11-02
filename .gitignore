@@ -1,0 +1,25 @@
+# Gradle / 构建产物
+.gradle/
+.kotlin/
+build/
+app/build/
+
+# 本机路径与 SDK 配置
+local.properties
+
+# 签名密钥（含密码，绝不入库）
+keystore/
+keystore.properties
+*.jks
+*.keystore
+
+# IDE
+.idea/
+*.iml
+captures/
+.DS_Store
+
+# 打包产物
+*.apk
+*.aab
+*.ap_

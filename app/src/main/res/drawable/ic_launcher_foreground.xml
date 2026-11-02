@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  桌面图标前景：一本竖立的书（白色书身 + 书脊凹槽 + 暖金色书签）。
+  书身与书脊用 evenOdd 合成，书脊处镂空露出背景色，形成自然的装订缝隙。
+  图形落在 108x108 画布中心的安全区内，可被任意形状遮罩裁切。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 书身：圆角矩形，内部镂出一条竖缝作为书脊 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M34,24 h40 a5,5 0 0 1 5,5 v50 a5,5 0 0 1 -5,5 h-40 a5,5 0 0 1 -5,-5 v-50 a5,5 0 0 1 5,-5 Z M42,27 h5 v54 h-5 Z" />
+
+    <!-- 书页：右侧三道细缝，暗示层叠纸页 -->
+    <path
+        android:fillColor="#2E7D5B"
+        android:fillAlpha="0.20"
+        android:pathData="M71,75.5 h5 v2.4 h-5 Z M71,70.5 h5 v2.4 h-5 Z M71,65.5 h5 v2.4 h-5 Z" />
+
+    <!-- 书签：从书顶探出，末端 V 形缺口 -->
+    <path
+        android:fillColor="#E3B67A"
+        android:pathData="M60,22 h9 v37 l-4.5,-6.5 l-4.5,6.5 Z" />
+</vector>

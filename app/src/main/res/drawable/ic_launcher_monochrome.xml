@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 13+ 主题图标（单色）：只保留书本剪影，系统按主题染色 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 书身 + 书脊缝（evenOdd 只作用于这一条路径） -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M34,24 h40 a5,5 0 0 1 5,5 v50 a5,5 0 0 1 -5,5 h-40 a5,5 0 0 1 -5,-5 v-50 a5,5 0 0 1 5,-5 Z M42,27 h5 v54 h-5 Z" />
+    <!-- 书签：独立路径，叠加在书身上仍是实心 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,22 h9 v37 l-4.5,-6.5 l-4.5,6.5 Z" />
+</vector>
