@@ -27,7 +27,11 @@ SMB / WebDAV 双协议，TXT、EPUB、PDF、Office 文档都能打开，翻页�
 
 ## 下载
 
-正式版 APK 见 [Releases](../../releases) 页，下载 `*.apk` 直接安装即可（Android 8.0 及以上）。
+最新正式版：[**novel-reader-v1.0.2-release.apk**](../../releases/latest)
+
+或到 [Releases](../../releases) 页选择其他版本，下载 `.apk` 直接安装即可（Android 8.0 及以上）。
+
+每个 Release 同时提供 `mapping-vX.Y.Z.txt`，那是 R8 混淆映射，只在还原崩溃堆栈时用得上，日常安装不需要下载。
 
 ## 构建
 
