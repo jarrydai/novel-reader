@@ -37,8 +37,9 @@ fun AppRoot() {
 
         if (browsing) {
             BrowserScreen(
+                // 阅读页只是叠在浏览层之上：返回后仍停在原来的目录和位置
+                active = session == null,
                 onOpenEntry = { entry, server ->
-                    browsing = false
                     session = ReadingSession(
                         book = Book(
                             id = Book.idOf(server.key, entry.url),

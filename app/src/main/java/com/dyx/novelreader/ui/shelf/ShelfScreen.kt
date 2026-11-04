@@ -234,7 +234,7 @@ fun ShelfScreen(
         AlertDialog(
             onDismissRequest = { confirmBatchDelete = false },
             title = { Text("移出 ${selected.size} 本书？") },
-            text = { Text("只会从书架移除，服务器上的文件不会被删除。阅读进度也会一并清除。") },
+            text = { Text("只会从书架移除，服务器上的文件不会被删除。\n本机缓存的副本和阅读进度会一并清除。") },
             confirmButton = {
                 TextButton(onClick = {
                     vm.deleteBooks(selected)

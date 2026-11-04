@@ -89,6 +89,20 @@ class BrowserViewModel(app: Application) : AndroidViewModel(app) {
         _browse.value = BrowseState()
     }
 
+    /**
+     * 每个目录的滑动位置（path -> 首可见项下标 / 项内偏移）。
+     *
+     * 存在 VM 里而不是 Compose 里：进子目录再返回、去阅读再回来、
+     * 甚至整个浏览层被移除后重新打开，都能落回原来的位置。
+     */
+    private val scrollPositions = mutableMapOf<String, Pair<Int, Int>>()
+
+    fun scrollOf(path: String): Pair<Int, Int>? = scrollPositions[path]
+
+    fun rememberScroll(path: String, index: Int, offset: Int) {
+        scrollPositions[path] = index to offset
+    }
+
     fun retry() {
         val state = _browse.value
         val server = state.server ?: return

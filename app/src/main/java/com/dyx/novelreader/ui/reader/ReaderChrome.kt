@@ -82,7 +82,7 @@ fun ReaderTopBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Rounded.ArrowBack, "返回书架", tint = colors.text)
+                Icon(Icons.AutoMirrored.Rounded.ArrowBack, "返回", tint = colors.text)
             }
             Column(Modifier.weight(1f)) {
                 Text(

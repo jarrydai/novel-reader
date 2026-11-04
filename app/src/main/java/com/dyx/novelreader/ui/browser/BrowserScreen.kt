@@ -27,12 +27,16 @@ import com.dyx.novelreader.viewmodel.BrowserViewModel
 /**
  * 书库浏览层：服务器列表 ↔ 目录浏览。
  *
- * 打开一本书后交给上层（加入书架 + 进入阅读页）。
+ * 打开一本书后交给上层（加入书架 + 进入阅读页）。阅读页是叠在本层之上的，
+ * 所以返回时目录、路径与滑动位置都还在原处。
+ *
+ * @param active 当前是否处于前台（阅读页打开时为 false，此时不接管返回键）
  */
 @Composable
 fun BrowserScreen(
     onOpenEntry: (RemoteEntry, RemoteServer) -> Unit,
     onExit: () -> Unit,
+    active: Boolean = true,
 ) {
     val vm: BrowserViewModel = viewModel()
     val servers by vm.servers.collectAsState()
@@ -47,7 +51,7 @@ fun BrowserScreen(
     var prefillProtocol by remember { mutableStateOf(RemoteProtocol.SMB) }
 
     // 返回键：目录内逐级返回，回到服务器列表后再返回则回书架
-    BackHandler {
+    BackHandler(enabled = active) {
         if (browse.server != null) vm.goUp() else onExit()
     }
 
@@ -99,6 +103,8 @@ fun BrowserScreen(
                     entries = browse.entries,
                     loading = browse.loading,
                     error = browse.error,
+                    initialScroll = vm.scrollOf(browse.path),
+                    onScrollChanged = { path, index, offset -> vm.rememberScroll(path, index, offset) },
                     onBack = { vm.goUp() },
                     onOpenDir = { vm.openDir(it) },
                     onOpenEntry = { entry -> onOpenEntry(entry, server) },

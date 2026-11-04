@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -56,9 +57,22 @@ class ReaderViewModel(app: Application) : AndroidViewModel(app) {
         _state.value = UiState(loading = true, book = book, initialOffset = book.charOffset)
 
         viewModelScope.launch {
+            // 从浏览页进来的 Book 是临时拼的（进度为 0），以书架里已存的进度为准
+            val stored = prefs.booksFlow.first().firstOrNull { it.id == book.id }
+            val merged = if (stored == null) book else book.copy(
+                charOffset = stored.charOffset,
+                progress = stored.progress,
+                chapterTitle = stored.chapterTitle,
+                pinned = stored.pinned,
+                finished = stored.finished,
+                addedAt = stored.addedAt,
+                lastReadAt = stored.lastReadAt,
+            )
+            currentBook = merged
+
             // 打开即入库（幂等）：保证后面写进度时书架里一定有这条记录
-            prefs.addToShelf(book)
-            prefs.touchBook(book.id)
+            prefs.addToShelf(merged)
+            prefs.touchBook(merged.id)
             withContext(Dispatchers.IO) {
                 try {
                     val entry = com.dyx.novelreader.data.model.RemoteEntry(
@@ -70,18 +84,19 @@ class ReaderViewModel(app: Application) : AndroidViewModel(app) {
                         kind = com.dyx.novelreader.data.model.FileKind.BOOK,
                         format = book.format,
                     )
-                    val doc = DocumentLoader.load(getApplication(), server, entry)
+                    // 带上书籍 ID：首次打开会边读边存到本地，之后再打开直接读缓存，不再连服务器
+                    val doc = DocumentLoader.load(getApplication(), server, entry, cacheKey = merged.id)
                     // PDF 的 charOffset 存的是页号
                     val offset = if (doc.isPdf) {
-                        book.charOffset.coerceIn(0, doc.pageCount - 1)
+                        merged.charOffset.coerceIn(0, doc.pageCount - 1)
                     } else {
-                        book.charOffset.coerceIn(0, maxOf(doc.length - 1, 0))
+                        merged.charOffset.coerceIn(0, maxOf(doc.length - 1, 0))
                     }
                     withContext(Dispatchers.Main) {
                         _state.value = UiState(
                             loading = false,
                             document = doc,
-                            book = book,
+                            book = merged,
                             initialOffset = offset,
                         )
                     }
@@ -90,7 +105,7 @@ class ReaderViewModel(app: Application) : AndroidViewModel(app) {
                         _state.value = UiState(
                             loading = false,
                             error = e.message ?: e.javaClass.simpleName,
-                            book = book,
+                            book = merged,
                         )
                     }
                 }

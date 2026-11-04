@@ -245,7 +245,7 @@ private fun ReaderError(
             modifier = Modifier.padding(top = 8.dp),
         )
         Row(Modifier.padding(top = 20.dp)) {
-            TextButton(onClick = onBack) { Text("返回书架") }
+            TextButton(onClick = onBack) { Text("返回") }
             Spacer(Modifier.width(10.dp))
             TextButton(onClick = onRetry) { Text("重试") }
         }

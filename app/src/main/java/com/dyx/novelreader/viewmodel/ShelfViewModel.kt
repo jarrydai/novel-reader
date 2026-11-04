@@ -4,15 +4,18 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dyx.novelreader.data.PrefsStore
+import com.dyx.novelreader.data.books.BookCache
 import com.dyx.novelreader.data.model.Book
 import com.dyx.novelreader.data.model.RemoteEntry
 import com.dyx.novelreader.data.model.RemoteServer
 import com.dyx.novelreader.data.model.ShelfSort
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.Collator
 import java.util.Locale
 
@@ -59,12 +62,18 @@ class ShelfViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun deleteBook(id: String) {
-        viewModelScope.launch { prefs.deleteBook(id) }
+        viewModelScope.launch {
+            prefs.deleteBook(id)
+            withContext(Dispatchers.IO) { BookCache.delete(getApplication(), id) }
+        }
     }
 
-    /** 批量移出书架（不动远端文件） */
+    /** 批量移出书架（不动远端文件，但会删掉本机缓存的那一份） */
     fun deleteBooks(ids: Set<String>) {
-        viewModelScope.launch { prefs.deleteBooks(ids) }
+        viewModelScope.launch {
+            prefs.deleteBooks(ids)
+            withContext(Dispatchers.IO) { ids.forEach { BookCache.delete(getApplication(), it) } }
+        }
     }
 
     /** 批量置顶 / 取消置顶 */
@@ -77,7 +86,10 @@ class ShelfViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun clearShelf() {
-        viewModelScope.launch { prefs.clearShelf() }
+        viewModelScope.launch {
+            prefs.clearShelf()
+            withContext(Dispatchers.IO) { BookCache.deleteAll(getApplication()) }
+        }
     }
 
     /** 用书架上记录的 serverId 找回服务器配置 */

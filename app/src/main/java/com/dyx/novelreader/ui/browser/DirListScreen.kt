@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -35,6 +36,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -62,6 +65,8 @@ fun DirListScreen(
     entries: List<RemoteEntry>,
     loading: Boolean,
     error: String?,
+    initialScroll: Pair<Int, Int>?,
+    onScrollChanged: (String, Int, Int) -> Unit,
     onBack: () -> Unit,
     onOpenDir: (String) -> Unit,
     onOpenEntry: (RemoteEntry) -> Unit,
@@ -93,7 +98,18 @@ fun DirListScreen(
                 message = "没有找到可阅读的文档（txt / epub / pdf / docx / xlsx / pptx 等）。",
             )
 
-            else -> {
+            else -> key(path) {
+                val listState = rememberLazyListState(
+                    initialFirstVisibleItemIndex = initialScroll?.first ?: 0,
+                    initialFirstVisibleItemScrollOffset = initialScroll?.second ?: 0,
+                )
+                // 离开这个目录（进子目录 / 去阅读 / 退出浏览）时记下位置，回来时原样还原
+                DisposableEffect(path) {
+                    onDispose {
+                        onScrollChanged(path, listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset)
+                    }
+                }
+
                 val folders = entries.count { it.isDir }
                 val books = entries.count { !it.isDir }
                 Text(
@@ -108,6 +124,7 @@ fun DirListScreen(
                     modifier = Modifier.padding(start = 22.dp, top = 14.dp),
                 )
                 LazyColumn(
+                    state = listState,
                     contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 28.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
